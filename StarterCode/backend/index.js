@@ -7,6 +7,12 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 
 //implement the CORS config
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
+})
 
 //products array
 let products = [
@@ -25,12 +31,19 @@ const fetchImageUrl = () => {
 
 //implement the get api for getting products
 app.get('/api/products', (req, res) => {
+    const imageProducts = products.map(product => ({
+        ...product,
+        imageUrl: fetchImageUrl()
+    }))
+    res.json(imageProducts)
 
 });
 
 //implement the delete api for deleting a product by Id
 app.delete('/api/products/:id', (req, res) => {
-    
+    const id = parseInt(req.params.id);
+    products = products.filter(product => product.id !== id);
+    res.json(products)
 });
 
 app.listen(PORT, () => {
